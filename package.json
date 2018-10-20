@@ -2,7 +2,11 @@
   "name": "liri-node-app",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app.js",
+  "dependencies": {
+    "node-spotify-api": "^1.0.7"
+  },
+  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -10,14 +14,10 @@
     "type": "git",
     "url": "git+https://github.com/HillerDavid/liri-node-app.git"
   },
-  "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/HillerDavid/liri-node-app/issues"
   },
-  "homepage": "https://github.com/HillerDavid/liri-node-app#readme",
-  "dependencies": {
-    "node-spotify-api": "^1.0.7"
-  }
+  "homepage": "https://github.com/HillerDavid/liri-node-app#readme"
 }

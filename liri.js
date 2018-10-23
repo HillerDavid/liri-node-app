@@ -12,7 +12,7 @@ const SPOTIFY = require('node-spotify-api');
 //Create new SPOTIFY object with keys
 let spotify = new SPOTIFY(keys.spotify);
 
-//Search spotify 
+//Search Spotify for songs
 function spotifySearch(songName) {
     let getArtistNames = (artist) => {
         return artist.name
@@ -33,15 +33,19 @@ function spotifySearch(songName) {
     });
 }
 
+//Search Bands In Town for concerts
 function bandsInTownSearch(artistName) {
     REQUEST(`https://rest.bandsintown.com/artists/${artistName}/events?app_id=${keys.bandsintown.id}`, function (error, response, body) {
         console.log('error:', error); // Print the error if one occurred
         console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-        let concert = JSON.parse(body)
-
-        console.log(`Venue: ${JSON.stringify(concert[0].venue.name)}`)
-        console.log(`Location: ${JSON.stringify(concert[0].venue.city)}, ${JSON.stringify(concert[0].venue.region)}`)
-        console.log(`Date: ${JSON.stringify(concert[0].datetime)}`)
+        let concerts = JSON.parse(body)
+        console.log(concerts)
+        for (let i = 0; i < concerts.length; i++) {
+            console.log(`Venue: ${concerts[i].venue.name}`)
+            console.log(`Location: ${concerts[i].venue.city}, ${concerts[i].venue.region}`)
+            let date = MOMENT(concerts[i].datetime, MOMENT.ISO_8601)
+            console.log(`Date: ${MOMENT(date).format('MM/DD/YYYY')}`)
+        }
     });
 }
 

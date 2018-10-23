@@ -5,8 +5,9 @@ require('dotenv').config()
 let keys = require('./keys.js')
 
 //Constants for require imports
-const REQUEST = require('request')
-const MOMENT = require('moment')
+const fs = require('fs')
+const request = require('request')
+const moment = require('moment')
 const SPOTIFY = require('node-spotify-api');
 
 //Create new SPOTIFY object with keys
@@ -22,6 +23,8 @@ function spotifySearch(songName) {
             return console.log('Error occurred: ' + error);
         }
         let songs = data.tracks.items
+    
+        console.log(songs)
         for (let i = 0; i < songs.length; i++) {
             console.log(`=================================================`)
             console.log(i)
@@ -36,7 +39,7 @@ function spotifySearch(songName) {
 
 //Search Bands In Town for concerts
 function bandsInTownSearch(artistName) {
-    REQUEST(`https://rest.bandsintown.com/artists/${artistName}/events?app_id=${keys.bandsintown.id}`, function (error, response, body) {
+    request(`https://rest.bandsintown.com/artists/${artistName}/events?app_id=${keys.bandsintown.id}`, function (error, response, body) {
         // Print the error if one occurred
         // console.log('error:', error)
         // Print the response status code if a response was received
@@ -47,8 +50,8 @@ function bandsInTownSearch(artistName) {
             console.log(i)
             console.log(`Venue: ${concerts[i].venue.name}`)
             console.log(`Location: ${concerts[i].venue.city}, ${concerts[i].venue.region}`)
-            let date = MOMENT(concerts[i].datetime, MOMENT.ISO_8601)
-            console.log(`Date: ${MOMENT(date).format('MM/DD/YYYY')}`)
+            let date = moment(concerts[i].datetime, moment.ISO_8601)
+            console.log(`Date: ${moment(date).format('MM/DD/YYYY')}`)
             console.log(`=================================================`)
         }
     });
@@ -56,7 +59,7 @@ function bandsInTownSearch(artistName) {
 
 //Search OMDB for movies
 function omdbSearch(movieTitle) {
-    REQUEST(`http://www.omdbapi.com/?t=${movieTitle}&apikey=9641550c`, function (error, response, body) {
+    request(`http://www.omdbapi.com/?t=${movieTitle}&apikey=9641550c`, function (error, response, body) {
         // Print the error if one occurred
         // console.log('error:', error)
         // Print the response status code if a response was received
@@ -77,20 +80,30 @@ function omdbSearch(movieTitle) {
 
 //Perform task stored in random.txt
 function doWhatItSays() {
-    
+    console.log(fs.readFile('./random.txt', 'utf-8', (error, data) => {
+        if (error) {
+            throw error
+        }
+        let randomSearch = data.split(',')
+        if (randomSearch.length > 1) {
+            option(randomSearch[0], randomSearch[1])
+        } else {
+            option(randomSearch[0])
+        }
+    }))
 }
 
 //Checks and runs search user input
-function option(command, data) {
+function option(command, itemData) {
     switch (command) {
         case 'spotify-this-song':
-            spotifySearch(data)
+            spotifySearch(itemData)
             break
         case 'concert-this':
-            bandsInTownSearch(data)
+            bandsInTownSearch(itemData)
             break
         case 'movie-this':
-            omdbSearch(data)
+            omdbSearch(itemData)
             break
         case 'do-what-it-says':
             doWhatItSays()
@@ -102,8 +115,8 @@ function option(command, data) {
 }
 
 //
-function runProgram(command, data) {
-    option(command, data)
+function runProgram(command, itemData) {
+    option(command, itemData)
 }
 
 //

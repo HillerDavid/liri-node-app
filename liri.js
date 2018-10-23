@@ -1,16 +1,16 @@
-//Configure dotenv package
+// Configure dotenv package
 require('dotenv').config()
 
-//Import keys.js file
+// Import keys.js file
 let keys = require('./keys.js')
 
-//Constants for require imports
+// Constants for require imports
 const fs = require('fs')
 const request = require('request')
 const moment = require('moment')
 const SPOTIFY = require('node-spotify-api');
 
-//Function to append to log
+// Function to append to log
 function writeLog(logData) {
     fs.appendFile('log.txt', logData, function (error) {
         if (error) throw error
@@ -18,17 +18,18 @@ function writeLog(logData) {
 }
 
 
-//Create new SPOTIFY object with keys
+// Create new SPOTIFY object with keys
 let spotify = new SPOTIFY(keys.spotify);
 
-//Search Spotify for songs
+// Search Spotify for songs
 function spotifySearch(songName = 'The Sign') {
 
     spotify.search({ type: 'track', query: songName }, function (error, data) {
-
+        // Print the error if one occurred
         if (error) {
             return console.log('Error occurred: ' + error);
         }
+
         let logData = ""
         let songs = data.tracks.items
         let getArtistNames = (artist) => {
@@ -48,14 +49,15 @@ function spotifySearch(songName = 'The Sign') {
             console.log(logData)
             writeLog(logData)
         } else {
-            option('spotify-this-song', 'The+Sign')
+            choice('spotify-this-song', 'The+Sign')
         }
     });
 }
 
-//Search Bands In Town for concerts
+// Search Bands In Town for concerts
 function bandsInTownSearch(artistName) {
     request(`https://rest.bandsintown.com/artists/${artistName}/events?app_id=${keys.bandsintown.id}`, function (error, response, body) {
+        // Print the error if one occurred
         if (error) {
             return console.log('Error occurred: ' + error);
         }
@@ -77,7 +79,7 @@ function bandsInTownSearch(artistName) {
     });
 }
 
-//Search OMDB for movies
+// Search OMDB for movies
 function omdbSearch(movieTitle = 'Mr. Nobody') {
     request(`http://www.omdbapi.com/?t=${movieTitle}&apikey=${keys.omdb.id}`, function (error, response, body) {
         // Print the error if one occurred
@@ -103,7 +105,7 @@ function omdbSearch(movieTitle = 'Mr. Nobody') {
     });
 }
 
-//Perform task stored in random.txt
+// Perform task stored in random.txt
 function doWhatItSays() {
     console.log(fs.readFile('./random.txt', 'utf-8', (error, data) => {
         if (error) {
@@ -111,15 +113,15 @@ function doWhatItSays() {
         }
         let randomSearch = data.split(',')
         if (randomSearch.length > 1) {
-            option(randomSearch[0], randomSearch[1])
+            choice(randomSearch[0], randomSearch[1])
         } else {
-            option(randomSearch[0])
+            choice(randomSearch[0])
         }
     }))
 }
 
-//Checks and runs search user input
-function option(command, itemData) {
+// Checks and runs search user input
+function choice(command, itemData) {
     switch (command) {
         case 'spotify-this-song':
             spotifySearch(itemData)
@@ -139,13 +141,13 @@ function option(command, itemData) {
     }
 }
 
-//
+// If itemData contains empty string, set to undefined
 function runProgram(command, itemData) {
     if (itemData === '') {
         itemData = undefined
     }
-    option(command, itemData)
+    choice(command, itemData)
 }
 
-//
+// Takes user input for arguments
 runProgram(process.argv[2], process.argv.slice(3, process.argv.length).toString().replace(",", "+"))

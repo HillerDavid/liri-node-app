@@ -10,29 +10,45 @@ const request = require('request')
 const moment = require('moment')
 const SPOTIFY = require('node-spotify-api');
 
+//Function to append to log
+function writeLog(logData) {
+    fs.appendFile('log.txt', logData, function (error) {
+        if (error) throw error
+    })
+}
+
+
 //Create new SPOTIFY object with keys
 let spotify = new SPOTIFY(keys.spotify);
 
 //Search Spotify for songs
-function spotifySearch(songName) {
-    let getArtistNames = (artist) => {
-        return artist.name
-    }
+function spotifySearch(songName = 'The Sign') {
+
     spotify.search({ type: 'track', query: songName }, function (error, data) {
+
         if (error) {
             return console.log('Error occurred: ' + error);
         }
+        let logData = ""
         let songs = data.tracks.items
-    
-        console.log(songs)
-        for (let i = 0; i < songs.length; i++) {
-            console.log(`=================================================`)
-            console.log(i)
-            console.log(`Artist(s): ${songs[i].artists.map(getArtistNames)}`)
-            console.log(`Song Title: ${songs[i].name}`)
-            console.log(`Preview Song: ${songs[i].preview_url}`)
-            console.log(`Album: ${songs[i].album.name}`)
-            console.log(`=================================================`)
+        let getArtistNames = (artist) => {
+            return artist.name
+        }
+        if (songs.length > 0) {
+            for (let i = 0; i < songs.length; i++) {
+
+                logData += `=================================================\r\n`
+                logData += `${i}\r\n`
+                logData += `Artist(s): ${songs[i].artists.map(getArtistNames)}\r\n`
+                logData += `Song Title: ${songs[i].name}\r\n`
+                logData += `Preview Song: ${songs[i].preview_url}\r\n`
+                logData += `Album: ${songs[i].album.name}\r\n`
+                logData += `=================================================\r\n`
+            }
+            console.log(logData)
+            writeLog(logData)
+        } else {
+            option('spotify-this-song', 'The+Sign')
         }
     });
 }
@@ -40,41 +56,50 @@ function spotifySearch(songName) {
 //Search Bands In Town for concerts
 function bandsInTownSearch(artistName) {
     request(`https://rest.bandsintown.com/artists/${artistName}/events?app_id=${keys.bandsintown.id}`, function (error, response, body) {
-        // Print the error if one occurred
-        // console.log('error:', error)
+        if (error) {
+            return console.log('Error occurred: ' + error);
+        }
         // Print the response status code if a response was received
         // console.log('statusCode:', response && response.statusCode)
+        let logData = ""
         let concerts = JSON.parse(body)
         for (let i = 0; i < concerts.length; i++) {
-            console.log(`=================================================`)
-            console.log(i)
-            console.log(`Venue: ${concerts[i].venue.name}`)
-            console.log(`Location: ${concerts[i].venue.city}, ${concerts[i].venue.region}`)
+            logData += `=================================================\r\n`
+            logData += `${i}\r\n`
+            logData += `Venue: ${concerts[i].venue.name}\r\n`
+            logData += `Location: ${concerts[i].venue.city}, ${concerts[i].venue.region}\r\n`
             let date = moment(concerts[i].datetime, moment.ISO_8601)
-            console.log(`Date: ${moment(date).format('MM/DD/YYYY')}`)
-            console.log(`=================================================`)
+            logData += `Date: ${moment(date).format('MM/DD/YYYY')}\r\n`
+            logData += `=================================================\r\n`
         }
+        console.log(logData)
+        writeLog(logData)
     });
 }
 
 //Search OMDB for movies
-function omdbSearch(movieTitle) {
-    request(`http://www.omdbapi.com/?t=${movieTitle}&apikey=9641550c`, function (error, response, body) {
+function omdbSearch(movieTitle = 'Mr. Nobody') {
+    request(`http://www.omdbapi.com/?t=${movieTitle}&apikey=${keys.omdb.id}`, function (error, response, body) {
         // Print the error if one occurred
-        // console.log('error:', error)
+        if (error) {
+            return console.log('Error occurred: ' + error);
+        }
         // Print the response status code if a response was received
         // console.log('statusCode:', response && response.statusCode)
+        let logData = ""
         let movie = JSON.parse(body)
-        console.log(`=================================================`)
-        console.log(`Title: ${movie.Title}`)
-        console.log(`Release Year: ${movie.Year}`)
-        console.log(`IMDB Rating: ${movie.Ratings[0].Value}`)
-        console.log(`Rotten Tomatoes Rating: ${movie.Ratings[1].Value}`)
-        console.log(`Produced in: ${movie.Country}`)
-        console.log(`Language: ${movie.Language}`)
-        console.log(`Plot: ${movie.Plot}`)
-        console.log(`Actors: ${movie.Actors}`)
-        console.log(`=================================================`)
+        logData += `=================================================\r\n`
+        logData += `Title: ${movie.Title}\r\n`
+        logData += `Release Year: ${movie.Year}\r\n`
+        logData += `IMDB Rating: ${movie.Ratings[0].Value}\r\n`
+        logData += `Rotten Tomatoes Rating: ${movie.Ratings[1].Value}\r\n`
+        logData += `Produced in: ${movie.Country}\r\n`
+        logData += `Language: ${movie.Language}\r\n`
+        logData += `Plot: ${movie.Plot}\r\n`
+        logData += `Actors: ${movie.Actors}\r\n`
+        logData += `=================================================\r\n`
+        console.log(logData)
+        writeLog(logData)
     });
 }
 
@@ -116,6 +141,9 @@ function option(command, itemData) {
 
 //
 function runProgram(command, itemData) {
+    if (itemData === '') {
+        itemData = undefined
+    }
     option(command, itemData)
 }
 

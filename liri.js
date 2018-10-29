@@ -23,7 +23,7 @@ let spotify = new SPOTIFY(keys.spotify);
 
 // Search Spotify for songs
 function spotifySearch(songName = 'The Sign') {
-
+    var songName = songName.replace(/'/g, '')
     spotify.search({ type: 'track', query: songName }, function (error, data) {
         // Print the error if one occurred
         if (error) {
@@ -93,8 +93,9 @@ function omdbSearch(movieTitle = 'Mr. Nobody') {
         logData += `=================================================\r\n`
         logData += `Title: ${movie.Title}\r\n`
         logData += `Release Year: ${movie.Year}\r\n`
-        logData += `IMDB Rating: ${movie.Ratings[0].Value}\r\n`
-        logData += `Rotten Tomatoes Rating: ${movie.Ratings[1].Value}\r\n`
+        movie.Ratings.forEach(function (data) {
+            logData += `${data.Source}: ${data.Value}\r\n`
+        })
         logData += `Produced in: ${movie.Country}\r\n`
         logData += `Language: ${movie.Language}\r\n`
         logData += `Plot: ${movie.Plot}\r\n`

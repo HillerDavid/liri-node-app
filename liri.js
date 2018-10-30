@@ -2,7 +2,7 @@
 require('dotenv').config()
 
 // Import keys.js file
-let keys = require('./keys.js')
+const keys = require('./keys.js')
 
 // Constants for require imports
 const fs = require('fs')

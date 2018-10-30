@@ -23,7 +23,7 @@ LIRI allows the user to search Bands in Town for bands' upcoming concerts, song 
 ## How to use LIRI commands
 -----------------------------
 **All commands should be entered looking in liri-node-app folder in a terminal.**
-![Starting Point](liri-node-app/Screenshots/start.png)
+![Starting Point](https://raw.github.com/HillerDavid/liri-node-app/tree/master/Screenshots/start.png)
 
 ### Search for Concerts
 
